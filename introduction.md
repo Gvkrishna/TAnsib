@@ -1,12 +1,5 @@
 # ansible-workshop Documentation
 
-## Release 0.
-
-## Praveen Kumar, Aditya Patawari
-
-**May 11, 2017**
-
-
 
 ## Contents
 
@@ -38,27 +31,6 @@
    - 13.5 Running a playbook with vault
 
 
-14 Further Reading 31
-
-15 Indices and tables 33
-
-**ii**
-
-
-```
-ansible-workshop Documentation, Release 0.
-```
-Contents:
-
-**Contents 1**
-
-
-**ansible-workshop Documentation, Release 0.**
-
-**2 Contents**
-
-
-# CHAPTER 1
 
 ## Introduction
 
@@ -72,16 +44,6 @@ Welcome to Ansible workshop.
 ## Goal
 
 To learn Ansible basics and create a simple Ansible playbook to install a web application and server.
-
-### 3
-
-
-**ansible-workshop Documentation, Release 0.**
-
-**4 Chapter 1. Introduction**
-
-
-# CHAPTER 2
 
 ## Basics of Ansible
 
@@ -106,27 +68,15 @@ protocol. Ansible scripts (commonly known as playbooks) are written in YAML and 
 Ansible can easily connect with Kerberos, LDAP, and other centralized authentication management systems.
 
 ## How to install Ansible?
+```
+#using pi
+pip install ansible
 
-We will install the Ansible by pip. Package managers like dnf, yum and apt can be used.
+#centos
+yum install epel-release
+yum install ansible
+```
 
-- On Fedora machines:
-
-### 5
-
-
-**ansible-workshop Documentation, Release 0.**
-
-# dnf install ansible
-
-- On CentOS machines
-
-# yum install epel-release
-# yum install ansible
-
-**6 Chapter 2. Basics of Ansible**
-
-
-# CHAPTER 3
 
 ## Inventory File
 
@@ -134,17 +84,16 @@ Inventory defines the groups of hosts which are alike in any way. For example, y
 servers in one group and application servers in another. A group can have multiple server and one server can be a part
 of multiple groups.
 Name of group is enclosed in square brackets []. Server names can be their DNS names or IP addresses.
-
+```
 [webservers]
 server
 [application]
 server
 server
-
-By default, ansible looks for the inventory file at/etc/ansible/hosts, but that can be modified by passing a-i <inven-
-tory_pathto the ansible command line.
+```
+By default, ansible looks for the inventory file at/etc/ansible/hosts, but that can be modified by passing a-i inventory_pathto the ansible command line.
 We can modify the way ansible connects to our hosts by supplying additional information in the inventory file.
-
+```
 [webservers]
 server1 ansible_port=4242 ansible_user=adimania
 [application]
@@ -152,22 +101,9 @@ server
 server
 [master]
 localhost ansible_connection=local
-
+```
 A more exhaustive list of inventory parameters can be seen here - [http://docs.ansible.com/ansible/intro_inventory.](http://docs.ansible.com/ansible/intro_inventory.)
-html#list-of-behavioral-inventory-parameters
-There are times when you would want to pull the inventory from a cloud provider, or from LDAP, or you would
-want the inventory list to be generated using some logic, rather than from a simple text-based inventory list. For such
-purposes, we can use Dynamic Inventory, but that’s a topic for another day.
 
-### 7
-
-
-**ansible-workshop Documentation, Release 0.**
-
-**8 Chapter 3. Inventory File**
-
-
-# CHAPTER 4
 
 ## Modules
 
@@ -177,40 +113,30 @@ selves.
 A module can be invoked from commandline or can be included in an Ansible playbook.
 We will discuss playbooks in a minute but for now, let us see modules in action.
 To use modules from the command line, we write ansible ad-hoc commands, like the following -
-
+```
 $ ansible all -m ping
-
+```
 Above example will use the ping module to ping all the hosts defined in the inventory. There are several modules
 available in ansible. Let us try another one.
-
+```
 $ ansible webservers -m command -a "ls"
-
+```
 In the above example, we use command module to fire ls command on the webservers group.
-
+```
 $ ansible -i inventory all -m command -a "iptables -F" --become --ask-become-pass
-
+```
 Here, we use thecommandmodule to flush iptables rules on all the hosts in the inventory, and we tell ansible to execute
 the command with sudo privileges using–becomeand ask us the sudo password using–ask-become-pass.
-
+```
 $ ansible all -m setup
-
+```
 Ansible gathers facts about the hosts the tasks are being run against, which can be used later in the playbook execution,
 we can see all facts using the command above.
 See how to extract particular facts in the documentation ofsetupmodule. To see the documentation, run -
-
+```
 $ ansible-doc setup
+```
 
-Usingansible-doc <module name>we can check the documentation of any ansible module.
-
-### 9
-
-
-**ansible-workshop Documentation, Release 0.**
-
-**10 Chapter 4. Modules**
-
-
-# CHAPTER 5
 
 ## Playbooks
 
@@ -218,15 +144,15 @@ Playbooks are a description of policies that you want to apply to your systems. 
 and the arguments that will run on your system so that ansible gets to know the current state. They are written in
 YAML. They begin with “—”, followed by the group name of the hosts where the playbook would be run.
 Example:
-
+```
 ---
 hosts: localhost
 
 - name: install nginx
     yum: name=nginx state=installed
-
+```
 The example above will install Nginx on our systems. Let us also install pip, flask and our flask app.
-
+```
 ---
 hosts: localhost
 
@@ -238,16 +164,11 @@ hosts: localhost
     pip: name=flask
 - name: fetch application
     git: repo=https://gist.github.com/c454e2e839fcb20605a3.git dest=flask-demo
-
+```
 Now we should also copy the config file for Nginx and systemd service file for our flask app. We will also define a
 couple of handlers. Handlers are executed if there is any change in state of the task which is supposed to notifies them.
 When we will be done with the workshop, our final playbook will look something like this:
-
-### 11
-
-
-**ansible-workshop Documentation, Release 0.**
-
+```
 ---
 
 - hosts: localhost
@@ -280,16 +201,16 @@ When we will be done with the workshop, our final playbook will look something l
           service: name=nginx state=restarted
        - name: restart flask app
           service: name=flask-demo state=restarted
-
+```
 We can also skip a particular task or make a task execute only if a condition is met using the When statement.
-
+```
 tasks:
 
 - shell: yum provides*/elinks
     when: ansible_os_family == "RedHat"
-
+```
 Suppose we have a list of items we have to iterate on for a particular task, we can use loops like the following
-
+```
 - name: add ssh users
     user:
        name: "{{item}}"
@@ -299,15 +220,11 @@ Suppose we have a list of items we have to iterate on for a particular task, we 
        - sshuser
        - sshuser
        - sshuser
-
-**12 Chapter 5. Playbooks**
-
-
 ```
-ansible-workshop Documentation, Release 0.
-```
+
+
 We can also run certain tasks from a playbook by tagging them -
-
+```
 ---
 
 - hosts: localhost
@@ -325,33 +242,20 @@ We can also run certain tasks from a playbook by tagging them -
        pip: name=flask
        tags:
           - dev
-
-We can run the system tagged tasks by runningansible-playbook playbook.yml –ask-become-pass –tags system
-We can skip the system tagges tasks by runningansible-playbook playbook.yml –ask-become-pass –skip-tags system
-
-### 13
-
-
-**ansible-workshop Documentation, Release 0.**
-
-**14 Chapter 5. Playbooks**
-
-
-# CHAPTER 6
-
+```
 ## Variables
 
 There are times when we have a bunch of similar servers but they are not exactly the same. For example, consider
 webservers. They may all run Nginx and might have same set of users accounts and ACLs but they may vary slightly
 in configuration. For such scenarios, variables are very helpful. A variable name can only consist of letters, numbers,
 and underscores and should always start with a letter. Below is an example of a variable definition in a playbook.
-
+```
 - hosts: webservers
     vars:
        http_port: 80
-
+```
 We can save the result of a command to a variable and use that somewhere else in the playbook, e.g. in conditionals.
-
+```
 tasks:
 
 - name: list contents of directory
@@ -360,22 +264,13 @@ tasks:
 - name: check contents for emptiness
     debug: msg="Directory is empty"
     when: contents.stdout == ""
-
-### 15
-
-
-**ansible-workshop Documentation, Release 0.**
-
-**16 Chapter 6. Variables**
-
-
-# CHAPTER 7
+```
 
 ## Condition handling
 
 Conditionals help us evaluate a variable and take some action on the basis of the outcome.
 Example:
-
+```
 ---
 
 - hosts: localhost
@@ -384,16 +279,8 @@ Example:
     tasks:
        - shell: echo good state
           when: state
+```
 
-### 17
-
-
-**ansible-workshop Documentation, Release 0.1**
-
-**18 Chapter 7. Condition handling**
-
-
-# CHAPTER 8
 
 ## System Configurations
 
@@ -413,15 +300,7 @@ selinux: policy=targeted state=enforcing
 - name: create the user
 user: name=aditya
 
-### 19
 
-
-**ansible-workshop Documentation, Release 0.1**
-
-**20 Chapter 8. System Configurations**
-
-
-# CHAPTER 9
 
 ## Application Orchestration
 
@@ -430,19 +309,12 @@ package and use yum or apt module of ansible to install the application. Handler
 the application post the deploy. Alternatively, git module can be used to clone or pull the code from a repository and
 install or update the application.
 Example:
-
+```
 - name: fetch application
     git: repo=https://gist.github.com/c454e2e839fcb20605a3.git dest=/opt/flask-demo
-
-### 21
-
-
-**ansible-workshop Documentation, Release 0.1**
-
-**22 Chapter 9. Application Orchestration**
+```
 
 
-# CHAPTER 10
 
 ## Roles
 
@@ -450,7 +322,7 @@ Ansible playbooks can get very, very long with time, and hence difficult to main
 a subset of tasks from a playbook, that would get difficult as the playbooks get bigger and bigger.
 Ansible roles can help you with grouping content, managing playbooks for a large project.
 Example project structure:
-
+```
 site.yml
 webservers.yml
 fooservers.yml
@@ -471,20 +343,16 @@ handlers/
 vars/
 defaults/
 meta/
-
+```
 In a playbook, it would look like this:
-
+```
 ---
 
 - hosts: webservers
     roles:
        - common
        - webservers
-
-### 23
-
-
-**ansible-workshop Documentation, Release 0.1**
+```
 
 This designates the following behaviors, for each role ‘x’:
 
@@ -497,10 +365,6 @@ This designates the following behaviors, for each role ‘x’:
 - Any copy, script, template or include tasks (in the role) can reference files in roles/x/{files,templates,tasks}/ (dir
     depends on task) without having to path them relatively or absolutely
 
-**24 Chapter 10. Roles**
-
-
-# CHAPTER 11
 
 ## Cloud Infra Provising
 
@@ -509,7 +373,7 @@ manage your cloud infra.
 [http://docs.ansible.com/ansible/list_of_cloud_modules.html](http://docs.ansible.com/ansible/list_of_cloud_modules.html)
 Here we have sample playbook for openstack cloud provider.
 vars/main.yml
-
+```
 ---
 
 OS_USERNAME: user1
@@ -522,9 +386,9 @@ FLAVOR: m1.tiny
 OSIMG: cirros-0.3.3
 INSTCNT: 3
 INSTNAME: ansible-demo
-
+```
 tasks/main.yml
-
+```
 ---
 
 - name: Launch instances **in** tenant
@@ -534,13 +398,8 @@ tasks/main.yml
 ˓→}} --nic net-id={{ SHARED_NETWORK }}
 --security-group default --key-name {{ KEY_NAME }} --min-count {{ INSTCNT }}
 ˓→{{ INSTNAME }}
-
+```
 you can use openstack-API instead of CLI to perform same task.
-
-### 25
-
-
-**ansible-workshop Documentation, Release 0.1**
 
 For DigitalOcean Droplet provisioning, refer to the respective directory in the root of this repository for playbooks.
 Before running the playbooks, make sure you have done the following -
@@ -549,10 +408,6 @@ Before running the playbooks, make sure you have done the following -
 - Login to your DO account, and under API, generate your API token, and then export it to the environment as
     DO_API_TOKEN=<token>
 
-**26 Chapter 11. Cloud Infra Provising**
-
-
-# CHAPTER 12
 
 ## Custom Modules
 
@@ -586,18 +441,14 @@ PARSED OUTPUT
 ```
 If you don’t get any desired output then you might have to check your test module code again.
 
-### 27
-
-
-**ansible-workshop Documentation, Release 0.1**
 
 **Read Input**
 
 We will pass a key value pair (time=<string>) to module and check if we are able to set time for a system.
 Let’s set time to “Oct 7 10:10”
-
+```
 - update timetest.py with latest changes (check in code directory)
-
+```
 $ hacking/test-module -m workshop-ansible/code/timetest_update.py -a "time=\"May 7
 ˓→10:10\""
 * including generated source, if any, saving to:
@@ -616,10 +467,7 @@ Thu May 7 10:10:00 IST 2015
 source
 Example
 
-**28 Chapter 12. Custom Modules**
 
-
-# CHAPTER 13
 
 ## Ansible Vault
 
@@ -645,10 +493,9 @@ ansible-vault rekey foo.yml
 
 ansible-vault view foo.yml
 
-### 29
 
 
-**ansible-workshop Documentation, Release 0.1**
+
 
 **Running a playbook with vault**
 
@@ -656,26 +503,10 @@ ansible-playbook site.yml --ask-vault- **pass**
 ansible-playbook site.yml --vault-password-file ~/.vault_pass.txt
 ansible-playbook site.yml --vault-password-file ~/.vault_pass.py
 
-**30 Chapter 13. Ansible Vault**
-
-
-# CHAPTER 14
-
-## Further Reading
 
 - Ansible Documentation: [http://docs.ansible.com/ansible/](http://docs.ansible.com/ansible/)
 - Fedora’s Ansible repo: https://infrastructure.fedoraproject.org/cgit/ansible.git
 - Introduction to Ansible Video: https://www.youtube.com/watch?v=ak4yW6mF7Ns
-
-### 31
-
-
-**ansible-workshop Documentation, Release 0.1**
-
-**32 Chapter 14. Further Reading**
-
-
-# CHAPTER 15
 
 ## Indices and tables
 
@@ -683,6 +514,5 @@ ansible-playbook site.yml --vault-password-file ~/.vault_pass.py
 - modindex
 - search
 
-### 33
 
 
