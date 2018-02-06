@@ -1,30 +1,3 @@
-===============
-Quick reference
-===============
-
-Quick reference to parameters and special variables.
-
-Facts
-=====
-
-See facts_.
-
-.. _facts: facts.rst
-
-
-EC2 stuff
-=========
-
-See ec2_.
-
-.. _ec2: ec2.rst
-
-Docker stuff
-============
-
-See docker_.
-
-.. _docker: docker.rst
 
 Built-in variables
 ==================
@@ -43,23 +16,6 @@ ansible_version                A dict with ansible version info: ``{"full": 1.8.
 role_path                      The current role’s pathname (available only inside a role)
 ============================   =========================================================================================================================================================================================================
 
-These can be useful if you want to use a variable associated with a different host. For
-example, if you are using the EC2 dynamic inventory and have a single host with
-the tag "Name=foo", and you want to access the instance id in a different play,
-you can do something like this::
-
-    - hosts: tag_Name_foo
-      tasks:
-        - action: ec2_facts
-
-      ...
-
-    - hosts: localhost
-      vars:
-        instance_id: {{ hostvars[groups['tag_Name_foo'][0]]['ansible_ec2_instance_id'] }}
-      tasks:
-        - name: print out the instance id for the foo instance
-          debug: msg=instance-id is {{ instance_id }}
 
 Internal variables
 ==================
@@ -155,34 +111,6 @@ delay               Used with "until", seconds to wait between retries. Default:
 run_once            If true, runs task on only one of the hosts
 always_run          If true, runs task even when in --check mode
 ==================  =========================================================================================
-
-Complex args
-============
-There are three ways to specify complex arguments:
-
-just pass them::
-
-    - ec2_tag:
-        resource: vol-abcdefg
-        tags:
-          Name: my-volume
-
-action/module parameter::
-
-    - action:
-        module: ec2_tag
-        resource: vol-abcdefg
-        tags:
-          Name: my-volume
-
-args parameter::
-
-    - ec2_tag: resource=vol-abcdefg
-      args:
-        tags:
-          Name: my-volume
-
-
 
 
 Host variables that modify ansible behavior
