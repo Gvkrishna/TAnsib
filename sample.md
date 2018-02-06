@@ -1,6 +1,31 @@
 ===============
 Quick reference
 ===============
+
+Quick reference to parameters and special variables.
+
+Facts
+=====
+
+See facts_.
+
+.. _facts: facts.rst
+
+
+EC2 stuff
+=========
+
+See ec2_.
+
+.. _ec2: ec2.rst
+
+Docker stuff
+============
+
+See docker_.
+
+.. _docker: docker.rst
+
 Built-in variables
 ==================
 
@@ -130,6 +155,32 @@ delay               Used with "until", seconds to wait between retries. Default:
 run_once            If true, runs task on only one of the hosts
 always_run          If true, runs task even when in --check mode
 ==================  =========================================================================================
+
+Complex args
+============
+There are three ways to specify complex arguments:
+
+just pass them::
+
+    - ec2_tag:
+        resource: vol-abcdefg
+        tags:
+          Name: my-volume
+
+action/module parameter::
+
+    - action:
+        module: ec2_tag
+        resource: vol-abcdefg
+        tags:
+          Name: my-volume
+
+args parameter::
+
+    - ec2_tag: resource=vol-abcdefg
+      args:
+        tags:
+          Name: my-volume
 
 
 
