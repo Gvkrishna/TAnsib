@@ -1,4 +1,4 @@
-# ansible-workshop Documentation
+# ansible Documentation
 
 
 ## Contents
