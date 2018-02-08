@@ -68,4 +68,31 @@ Ansible can also use a custom `Dynamic Inventory script` , which can dynamically
   * The Playbook format is YAML. 
   * Each Playbook maps a group of hosts to a set of roles. 
   * Each role is represented by calls to Ansible tasks.
+  
+  
+  
+  ROLES:
+
+    Roles are ways of automatically loading certain vars, files, tasks, and handlers based on a known file structure.
+    Grouping content by roles also allows easy sharing of roles with other users. Roles can be shared and pulled from Ansible Galaxy, GitHub, etc.
+
+TASKS(Plays):
+
+    Each playbook contains a list of tasks. Tasks are executed in order, one at a time, against all machines matched by the host pattern, before moving on to the next task.
+    The goal of each task is to execute a module, with very specific arguments.
+
+HANDLERS:
+
+    Handlers are one of the conditional forms supported by Ansible. A handler is similar to a task, but it runs only if it was notified by a task.
+    An example situation where handlers are useful is when a task modifies a configuration file of some service, MySQL for example. In order for changes to take effect, the service needs to be restarted.
+
+– name: change mysql max connections
+template: src=edited_my.conf dest=/etc/foo.conf
+notify:
+– restart mysql
+handlers:
+– name: restart mysql
+service: name=mysql state=restarted
+
+Notify keyword acts as a trigger for the handler named “restart_mysql”.
 
