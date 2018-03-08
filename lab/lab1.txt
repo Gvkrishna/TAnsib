@@ -1,0 +1,51 @@
+TESTING LAB WITH FIRST ANSIBLE COMMANDS
+======================================================
+
+============================================
+ADHOC COMMANDS
+=================================
+Where 
+-m = Module name
+-a = allow parameters
+-u = username
+
+
+ansible 127.0.0.1 -m file -a "dest=/opt/a.txt mode=600 state=touch"
+ansible 127.0.0.1 -m file -a "dest=/opt/a.txt mode=600 state=touch"
+ansible 127.0.0.1 -m file -a "dest=/opt/a.txt mode=600 state=touch owner=ec2-user"
+ansible 127.0.0.1 -m file -a "dest=/opt/b.txt mode=755 state=touch owner=ec2-user"
+ansible 127.0.0.1 -m file -a "dest=/opt/c.txt mode=755 state=touch owner=ec2-user"
+ansible 127.0.0.1 -m file -a "dest=/opt/bmc.txt mode=755 owner=ec2-user"
+
+ansible localhost -m file -a "dest=/opt/bmcdir mode=755 owner=ec2-user group=ec2-user state=directory"
+
+ansible 127.0.0.1 -m yum -a "name=httpd state=present"
+ansible 127.0.0.1 -m yum -a "name=httpd state=absent"
+
+
+ansible 127.0.0.1 -m service -a "name=httpd state=started"
+ansible 127.0.0.1 -m service -a "name=httpd state=stopped"
+
+ansible 127.0.0.1 -m command -a "/bin/yum update -y"
+ansible 127.0.0.1 -a "/bin/yum update -y"
+
+ansible 127.0.0.1 -m copy -a "src: /srv/myfiles/foo.conf dest: /etc/foo.conf"
+
+==========================================================
+Ansible Commands modules
+=======================================================
+
+
+
+
+Ansible Shell Modules
+====================================================
+
+
+
+
+
+
+FACT MODULE
+===============
+ansible 127.0.0.1 -m setup

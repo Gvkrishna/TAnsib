@@ -1,0 +1,47 @@
+AD HOC
+==========
+
+ansible raleigh -m shell -a 'echo $TERM'
+ansible atlanta -m copy -a "src=/etc/hosts dest=/tmp/hosts"
+
+FILE
+ansible webservers -m file -a "dest=/srv/foo/a.txt mode=600"
+ansible webservers -m file -a "dest=/srv/foo/b.txt mode=600 owner=mdehaan group=mdehaan"
+ansible webservers -m file -a "dest=/path/to/c mode=755 owner=mdehaan group=mdehaan state=directory"
+ansible webservers -m file -a "dest=/path/to/c state=absent"
+
+PACKAGE
+ansible webservers -m yum -a "name=acme state=present"
+ansible webservers -m yum -a "name=acme-1.5 state=present"
+ansible webservers -m yum -a "name=acme state=latest"
+ansible webservers -m yum -a "name=acme state=absent"
+
+USERS & GROUPS
+ansible all -m user -a "name=foo password=<crypted password here>"
+ansible all -m user -a "name=foo state=absent"
+
+GIT
+ansible webservers -m git -a "repo=git://foo.example.org/repo.git dest=/srv/myapp version=HEAD"
+
+SERVICES
+ansible webservers -m service -a "name=httpd state=started"
+ansible webservers -m service -a "name=httpd state=restarted"
+ansible webservers -m service -a "name=httpd state=stopped"
+
+FACTS
+ansible all -m setup
+
+Method 1 =
+
+$ ssh-agent bash
+$ ssh-add ~/.ssh/id_rsa
+--ask-pass
+--ask-become-pass OR -K
+--become-user
+--private-key
+
+ansible localhost  -a "/bin/echo hello"
+
+inventory file
+===============================================
+localhost ansible_connection=local ansible_python_interpreter="/usr/bin/env python"
