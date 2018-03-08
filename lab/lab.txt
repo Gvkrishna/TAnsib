@@ -1,0 +1,214 @@
+ ansible testserver -m ping
+ ansible testserver -m command -a uptime
+ ansible testserver -a uptime #command modulue is a default modulue
+ ansible testserver -a "tail /var/log/dmesg"
+ ansible testserver -s -a "tail /var/log/syslog" # -s flag is sudo as root
+ ansible testserver -s -m apt -a name=nginx
+ ansible testserver -s -m service -a "name=nginx \
+ state=restarted" # If installing nginx fails for you, you might need to update the package lists
+
+#playbook
+Most of your time in Ansible will be spent writing playbooks. A playbook is the term
+that Ansible uses for a configuration management script. 
+
+
+
+
+FACT MODULE
+===============
+ansible 127.0.0.1 -m setup
+
+
+
+
+
+ansible app -i hosts -m file -s -a "dest=a.txt mode=600 state=touch"
+ansible app -i hosts -m file -s -a "dest=/opt/a.txt mode=600 state=touch"
+ansible app -i hosts -m file -s -a "dest=/opt/a.txt state=absent"
+ansible app -i hosts -m file -s -a "dest=/opt/a.txt mode=600 state=touch"
+ansible app -i hosts -m file -s -a "dest=/opt/a.txt mode=777"
+
+
+ansible app -i hosts  -m yum -s -a "name=httpd state=present"
+ansible app -i hosts  -m service -s -a "name=httpd state=started
+ansible app -i hosts  -m service -s -a "name=httpd state=stopped"
+
+
+PRIVATE KEY
+--private-key=node.pem -u ec2-user
+
+PASSWORD PROMPT
+-k
+--ask-pass
+
+Sudo
+-K
+--ask-become-pass
+
+playbooks
+
+
+- name: "Delete logs that we for sure 100% won't ever need to look at"
+  hosts: app
+  tasks:
+    - name: "Create file"
+      file: path=my-ansible-file state=touch
+
+
+- hosts: app
+  sudo: yes
+  remote_user: vagrant
+ 
+  tasks:
+   - name: Ensure that Apache is installed
+     yum: name=httpd state=absent
+
+  # - name: Start Apache Services
+   #  service: name=httpd enabled=yes state=started
+
+
+
+
+second.yml
+
+---
+- hosts: app
+  sudo: yes
+  #ansible_ssh_private_key_file: nremote_key.pem
+  
+  tasks:
+  - name: Ensure that Apache is installed
+    yum: name=httpd state=present
+    when: ansible_os_family == "RedHat"
+
+  - name: Start Apache Services
+    service: name=httpd enabled=yes state=started
+
+
+
+
+##include
+
+# include a play after another play
+- hosts: app
+  tasks:
+    - debug:
+        msg: "play1"
+
+- include: web.yml
+
+
+###web.yml
+
+# include a play after another play
+- hosts: app
+  tasks:
+    - debug:
+        msg: "play1"
+
+- include: web.yml
+calsoft@clpstpdfc82:~/ans/test$ cat web.yml 
+- hosts: app
+  sudo: yes
+  vars:
+    http_port: 80
+    doc_dir: /ansible/
+    doc_root: /var/www/html/ansible/
+    max_clients: 5
+
+  tasks:
+  - name: Ensure that Apache is installed
+    yum: name=httpd state=present
+    when: ansible_os_family == "RedHat"
+
+
+
+ ###register
+
+ more register.yml
+---
+-
+  hosts: web
+  sudo: true
+  tasks:
+    -
+      command: "echo Hello"
+      name: "Create variable from command"
+      register: command_output
+    -
+      debug: "msg=\"{{command_output.stdout}}\""
+
+
+
+
+
+  - name: Start Apache Services
+    service: name=httpd enabled=yes state=started
+
+#########debug
+
+     cat debug.yml 
+---
+-
+  hosts: app
+  sudo: true
+  vars: 
+    test: hai
+  tasks:
+    -
+      debug: "msg=\"System {{ inventory_hostname }} has uuid {{ ansible_product_uuid }} and {{test}}\""
+
+
+#####prompt
+
+---
+- hosts: app
+  sudo: true
+  tasks:
+    - debug: "msg=\"Your User name is {{ name }}\""
+  vars_prompt:
+    - name: "name"
+      prompt: "what is your name?"
+    - name: "quest"
+      prompt: "what is your quest?"
+    - name: "favcolor"
+      prompt: "what is your favorite color?"
+
+
+
+###condition
+
+
+cat condition.yml 
+- hosts: app
+  tasks:
+  - name: echo hello
+    command: echo hello
+    register: result
+  - debug: msg="Enry is not equalt to blank"
+    when: result.stdout != ""
+  - debug: msg="Enry is equalt to blank"
+    when: result.stdout == ""
+
+
+
+ansible.cfg
+common.yml
+dbservers.yml
+inventory
+roles/
+site.yml
+site_alt.yml
+webservers.yml
+
+#####common.yml
+
+---
+- hosts: webservers
+  roles:
+  - server-common
+  sudo: yes
+
+
+
+
