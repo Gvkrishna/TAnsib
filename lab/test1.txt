@@ -1,0 +1,56 @@
+pip install ansible
+
+ansible --version
+
+mkdir ansible
+
+cd ansible/
+
+vagrant init ubuntu/trusty64
+
+vagrant up
+
+vagrant ssh
+
+vagrant ssh-config
+
+ssh vagrant@127.0.0.1 -p 2222 -i /Users/tmackinn/ansible/playbooks/.vagrant/machines/default/virtualbox/private_key
+
+cat > hosts
+
+testserver ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_user=vagrant ansible_ssh_private_key_file=/Users/tmackinn/ansible/playbooks/.vagrant/machines/default/virtualbox/private_key
+
+ansible testserver -i hosts -m ping
+
+cat > ansible.cfg
+[defaults]
+hostfile = hosts
+remote_user = vagrant
+private_key_file = /Users/tmackinn/ansible/playbooks/.vagrant/machines/default/virtualbox/private_key
+host_key_checking = false
+
+
+ansible testserver -i hosts -m command -a uptime
+
+ansible testserver -i hosts -m command -s -a "tail /var/log/dmesg"
+
+
+#Multiple hosts
+
+* `80` and `443` are forwarded to ports `8080` and `8443` respectively for VM 1
+* `80` and `443` are forwarded to ports `8081` and `8444` respectively for VM 2
+* `80` and `443` are forwarded to ports `8082` and `8445` respectively for VM 3
+
+
+hosts
+[webservers]
+vagrant1 ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222
+vagrant2 ansible_ssh_host=127.0.0.1 ansible_ssh_port=2200
+vagrant3 ansible_ssh_host=127.0.0.1 ansible_ssh_port=2201
+
+ansible.cfg
+[defaults]
+hostfile = hosts
+remote_user = vagrant
+private_key_file = ~/.vagrant.d/insecure_private_key
+host_key_checking = False
